@@ -14,12 +14,11 @@ module.exports = (values, asyncTransformer, opts) => {
     const results = []
     const progressList = []
 
-    const removeInProgressList = progress => {
+    const removeInProgressList = progress =>
       progressList.splice(progressList.indexOf(progress), 1)
-    }
-    const cancelAllProgress = _ => {
+
+    const cancelAllProgress = _ =>
       progressList.forEach(progress => progress.cancel && progress.cancel())
-    }
 
     let idx = -1
 
