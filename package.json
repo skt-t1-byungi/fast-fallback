@@ -1,11 +1,15 @@
 {
   "name": "fast-fallback",
   "description": "Fast fallback Lib that supports P-cancelable.",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "author": {
     "name": "skt-t1-byungi",
     "email": "tiniwz@gmail.com"
   },
+  "files": [
+    "index.js",
+    "dist"
+  ],
   "keywords": [
     "fallback",
     "p-cancelable"
@@ -20,7 +24,8 @@
   "license": "MIT",
   "scripts": {
     "test": "ava",
-    "build": "bili index.js --filename fallback.js --format cjs,umd-min --banner"
+    "build": "bili index.js --filename fallback.js --format cjs,umd-min --banner",
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "ava": "^0.25.0",
