@@ -1,56 +1,68 @@
-module.exports = (values, asyncTransformer, opts) => {
+class PList {
+  constructor () {
+    this._list = []
+  }
+
+  add (p) {
+    this._list.push(p)
+  }
+
+  remove (p) {
+    const list = this._list
+    list.splice(list.indexOf(p), 1)
+  }
+
+  isEmpty () {
+    return this._list.length === 0
+  }
+
+  cancelAll () {
+    this._list.forEach(p => p.cancel && p.cancel())
+  }
+}
+
+export default function (values, asyncTransformer, opts) {
   if (!Array.isArray(values)) {
     throw new TypeError('[fast-fallback] `values` must be an Array type!')
   }
 
-  opts = Object.assign({
+  opts = {
     count: 1,
     concurrency: Infinity,
-    silent: false
-  }, opts)
+    silent: false,
+    ...opts
+  }
 
   return new Promise((resolve, reject) => {
-    const queue = values.slice(0)
+    const queue = [...values]
     const results = []
-    const progressList = []
-
-    const removeInProgressList = progress =>
-      progressList.splice(progressList.indexOf(progress), 1)
-
-    const cancelAllProgress = _ =>
-      progressList.forEach(progress => progress.cancel && progress.cancel())
-
+    const pList = new PList()
     let idx = -1
 
     const next = _ => {
-      const promise = asyncTransformer(queue.shift(), ++idx)
-      progressList.push(promise)
+      const p = asyncTransformer(queue.shift(), ++idx)
+      pList.add(p)
 
-      promise
-        .then(result => {
-          removeInProgressList(promise)
-          if (results.length < opts.count) results.push(result)
+      p.then(result => {
+        pList.remove(p)
+        if (results.length < opts.count) results.push(result)
 
-          if (results.length === opts.count) {
-            cancelAllProgress()
-            return resolve(results)
-          }
+        if (results.length === opts.count) {
+          pList.cancelAll()
+          return resolve(results)
+        }
 
-          if (queue.length !== 0) next()
-          if (progressList.length === 0) resolve(results)
-        })
-        .catch(_ => {
-          removeInProgressList(promise)
+        if (queue.length !== 0) next()
+        if (pList.length === 0) resolve(results)
+      }).catch(_ => {
+        pList.remove(p)
 
-          if (queue.length !== 0) return next()
-          if (progressList.length !== 0) return
+        if (queue.length !== 0) return next()
+        if (!pList.isEmpty()) return
+        if (opts.silent || results.length > 0) return resolve(results)
 
-          if (!opts.silent && results.length === 0) {
-            return reject(new Error('[fast-fallback] All failed!'))
-          }
-
-          resolve(results)
-        })
+        reject(new Error('[fast-fallback] All failed!'))
+      })
     }
 
     let times = Math.min(queue.length, opts.concurrency)
