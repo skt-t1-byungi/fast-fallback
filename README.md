@@ -41,7 +41,7 @@ const asyncTransformer = server => new PCancelable((resolve, reject, onCancel)=>
     count: 1 // Number of fallback results
   })
 
-  ws.send(s)
+  ws.send(...)
 })()
 ```
 
@@ -60,10 +60,10 @@ Functions that generate promise using candidate value.
 Number of fallback results. defaults `1`.
 
 ##### concurrency
-number of concurrently processing promises. defaults `Infinity`.
+Number of concurrently processing promises. defaults `Infinity`.
 
 ##### silent
-If true, returns an empty array when all promises fail.<br>
+If true, returns an empty array when all promises fail.
 If false, throws an error when all promises fail.<br>
 defaults `false`.
 
