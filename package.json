@@ -3,10 +3,15 @@
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "test": "ava"
+  },
   "devDependencies": {
     "ava": "^0.25.0",
+    "delay": "^2.0.0",
     "eslint": "^4.19.1",
-    "eslint-config-byungi": "^0.0.12"
+    "eslint-config-byungi": "^0.0.12",
+    "p-cancelable": "^0.4.1"
   },
   "eslintConfig": {
     "extends": "byungi"

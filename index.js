@@ -3,17 +3,25 @@ module.exports = (values, asyncTransformer, opts) => {
     throw new TypeError('[fast-fallback] `values` must be an Array type!')
   }
 
-  return Promise((resolve, reject) => {
-    opts = Object.assign({ count: 1, concurrency: Infinity, silent: false }, opts)
+  opts = Object.assign({
+    count: 1,
+    concurrency: Infinity,
+    silent: false
+  }, opts)
 
+  return new Promise((resolve, reject) => {
     const queue = values.slice(0)
     const results = []
     const progressList = []
 
-    let idx = -1
+    const removeInProgressList = progress => {
+      progressList.splice(progressList.indexOf(progress), 1)
+    }
+    const cancelAllProgress = _ => {
+      progressList.forEach(progress => progress.cancel && progress.cancel())
+    }
 
-    const removeInProgressList = progress => progressList.splice(progressList.indexOf(progress), 1)
-    const cancelAllProgress = _ => progressList.forEach(progress => progress.cancel && progress.cancel())
+    let idx = -1
 
     const next = _ => {
       const promise = asyncTransformer(queue.shift(), ++idx)
@@ -22,12 +30,11 @@ module.exports = (values, asyncTransformer, opts) => {
       promise
         .then(result => {
           removeInProgressList(promise)
-          results.push(result)
+          if (results.length < opts.count) results.push(result)
 
           if (results.length === opts.count) {
             cancelAllProgress()
-            resolve(results)
-            return
+            return resolve(results)
           }
 
           if (queue.length !== 0) next()
@@ -39,10 +46,15 @@ module.exports = (values, asyncTransformer, opts) => {
           if (queue.length !== 0) return next()
           if (progressList.length !== 0) return
 
-          opts.silent || results.length > 0 ? resolve(results) : reject(new Error('[fast-fallback] All failed!'))
+          if (!opts.silent && results.length === 0) {
+            return reject(new Error('[fast-fallback] All failed!'))
+          }
+
+          resolve(results)
         })
     }
 
-    queue.splice(0, opts.concurrency).map(next)
+    let times = Math.min(queue.length, opts.concurrency)
+    while (times--) next()
   })
 }
