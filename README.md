@@ -63,8 +63,7 @@ Number of fallback results. defaults `1`.
 Number of concurrently processing promises. defaults `Infinity`.
 
 ##### silent
-If true, returns an empty array when all promises fail.
-If false, throws an error when all promises fail.<br>
+When all promises fail, return an empty array if false, or throw an exception if true.
 defaults `false`.
 
 ## License
