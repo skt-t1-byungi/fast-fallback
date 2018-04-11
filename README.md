@@ -28,6 +28,7 @@ const fallback = require("fast-fallback");
 const PCancelable = require('promise-cancelable');
 
 const servers = ['121.25.1.100', '121.25.1.101', '121.2.15.102']
+
 const asyncTransformer = server => new PCancelable((resolve, reject, onCancel)=>{
   const ws = new WebSocket('ws://' + server)
 
@@ -36,7 +37,7 @@ const asyncTransformer = server => new PCancelable((resolve, reject, onCancel)=>
 
   ws.onopen = _ => resolve(ws)
   ws.onerror = err => reject(err)
-})
+});
 
 (async_ => {
   const [ws] = await fallback(servers, asyncTransformer, {
