@@ -33,6 +33,10 @@ export default function (values, asyncTransformer, opts) {
     ...opts
   }
 
+  if (values.length < opts.count) {
+    throw new TypeError('[fast-fallback] `opts.count` value can not be larger than `values` array size!')
+  }
+
   return new Promise((resolve, reject) => {
     const queue = [...values]
     const results = []
