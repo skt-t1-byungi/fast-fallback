@@ -2,48 +2,32 @@ import test from 'ava'
 import delay from 'delay'
 import fallback from '.'
 
-const delaySec = sec =>
-  delay(sec * 1000).then(_ => sec)
+const pOk = async sec => {
+  await delay(sec * 1000)
+  return sec
+}
+const pErr = async sec => {
+  await delay(sec * 1000)
+  throw new Error('fail')
+}
 
 test('basic', async t => {
-  const results = await fallback([1, 0.8, 0.6, 0.4, 0.2, 0.1], delaySec)
+  let calls = 0
+  const results = await fallback([0.5, 0.4, 0.3, 0.2, 0.1], v => pOk(v).then(v => ++calls && v))
+
+  t.is(calls, 1)
   t.deepEqual(results, [0.1])
+
+  await delay(500)
+  t.is(calls, 5)
 })
 
 test('count', async t => {
-  const results1 = await fallback([1, 0.8, 0.6, 0.4, 0.2, 0.1], delaySec, {count: 2})
+  const results1 = await fallback([0.5, 0.4, 0.3, 0.2, 0.1], pOk, {count: 2})
   t.deepEqual(results1, [0.1, 0.2])
 
-  const results2 = await fallback([1, 0.8, 0.6, 0.4, 0.2, 0.1], delaySec, {count: 3})
-  t.deepEqual(results2, [0.1, 0.2, 0.4])
-})
+  const results2 = await fallback([0.5, 0.4, 0.3, 0.2, 0.1], pOk, {count: 3})
+  t.deepEqual(results2, [0.1, 0.2, 0.3])
 
-test('silent', async t => {
-  await t.throws(fallback([1, 2, 3], _ => Promise.reject(new Error())))
-
-  const result = await fallback([1, 2, 3], _ => Promise.reject(new Error()), {silent: true})
-  t.is(result.length, 0)
-})
-
-test('concurrency limit', async t => {
-  let actives = 0
-  let max = 0
-
-  const testRun = async sec => {
-    actives++
-    max = Math.max(max, actives)
-    await delaySec(sec)
-    actives--
-    return sec
-  }
-
-  const results1 = await fallback([1, 0.8, 0.6, 0.4, 0.2, 0.1], testRun, {concurrency: 2})
-  t.deepEqual(results1, [0.8])
-  t.is(max, 2)
-
-  actives = 0
-  max = 0
-  const results2 = await fallback([1, 0.8, 0.6, 0.4, 0.2, 0.1], testRun, {concurrency: 3})
-  t.deepEqual(results2, [0.6])
-  t.is(max, 3)
+  t.throws(_ => fallback([0.1], pOk, {count: 2}))
 })
