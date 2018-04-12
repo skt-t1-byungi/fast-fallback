@@ -53,7 +53,7 @@ const asyncTransformer = server => new PCancelable((resolve, reject, onCancel)=>
 Candidate values.
 
 #### asyncTransformer: (val, idx) => PCancelable\<Any>|Promise\<Any>
-Functions that generate promise using candidate value.
+Transform functions that generate promise using candidate value.
 
 #### options: object 
 ##### count
