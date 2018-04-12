@@ -1,6 +1,8 @@
 # fast-fallback
 Fast fallback Lib that supports P-cancelable.
 
+[![npm](https://img.shields.io/npm/v/fast-fallback.svg?style=flat-square)](https://www.npmjs.com/package/fast-fallback)
+
 ## Install
 ```sh
 yarn add fast-fallback
@@ -23,9 +25,10 @@ const fallback = require("fast-fallback");
 ## Usage
 ```js
 const fallback = require("fast-fallback");
-const PCancelable = require('p-cancelable');
+const PCancelable = require('promise-cancelable');
 
 const servers = ['121.25.1.100', '121.25.1.101', '121.2.15.102']
+
 const asyncTransformer = server => new PCancelable((resolve, reject, onCancel)=>{
   const ws = new WebSocket('ws://' + server)
 
@@ -34,7 +37,7 @@ const asyncTransformer = server => new PCancelable((resolve, reject, onCancel)=>
 
   ws.onopen = _ => resolve(ws)
   ws.onerror = err => reject(err)
-})
+});
 
 (async_ => {
   const [ws] = await fallback(servers, asyncTransformer, {
@@ -63,8 +66,12 @@ Number of fallback results. defaults `1`.
 Number of concurrently processing promises. defaults `Infinity`.
 
 ##### silent
-When all promises fail, return an empty array if false, or throw an exception if true.
+When all promises fail, return an empty array if true, or throw an exception if false.
 defaults `false`.
+
+## Related
+- [promise-cancelable](https://www.npmjs.com/package/promise-cancelable) - for browser
+- [p-cancelable](https://github.com/sindresorhus/p-cancelable) - for node
 
 ## License
 MIT
