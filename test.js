@@ -63,7 +63,7 @@ test('concurrency', async t => {
   t.deepEqual(results, [0.5])
 })
 
-test.only('supports cancel', async t => {
+test('supports cancel', async t => {
   const cancelList = []
 
   const results = await fallback(

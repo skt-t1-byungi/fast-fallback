@@ -1,6 +1,11 @@
 class PList {
   constructor () {
     this._list = []
+    this._isCanceled = false
+  }
+
+  get isCanceled () {
+    return this._isCanceled
   }
 
   add (p) {
@@ -17,6 +22,7 @@ class PList {
   }
 
   cancelAll () {
+    this._isCanceled = true
     this._list.forEach(p => p.cancel && p.cancel())
   }
 }
@@ -59,9 +65,12 @@ export default function (values, asyncTransformer, opts) {
         if (queue.length !== 0) next()
         if (pList.length === 0) resolve(results)
       }).catch(_ => {
+        // If `pList.isCanceled` is true, it is already resolved
+        if (pList.isCanceled) return
+
         pList.remove(p)
 
-        if (queue.length !== 0) return next()
+        if (queue.length > 0) return next()
         if (!pList.isEmpty()) return
         if (opts.silent || results.length > 0) return resolve(results)
 
