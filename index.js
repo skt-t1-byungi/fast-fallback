@@ -22,6 +22,8 @@ class PList {
   }
 
   cancelAll () {
+    if (this._isCanceled) return
+
     this._isCanceled = true
     this._list.forEach(p => p.cancel && p.cancel())
   }
