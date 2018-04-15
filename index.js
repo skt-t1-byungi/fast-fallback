@@ -31,14 +31,14 @@ class Defer {
   }
 
   resolve (v) {
-    if (this._completed) return
-    this._completed = true
+    if (this.completed) return
+    this.completed = true
     this._resolve(v)
   }
 
   reject (err) {
-    if (this._completed) return
-    this._completed = true
+    if (this.completed) return
+    this.completed = true
     this._reject(err)
   }
 }
