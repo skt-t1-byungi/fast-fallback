@@ -23,6 +23,12 @@ test('basic', async t => {
   t.is(calls, 5)
 })
 
+test('curring', async t => {
+  const fback = fallback(pOk)
+  const results = await fback([0.5, 0.4, 0.3, 0.2, 0.1])
+  t.deepEqual(results, [0.1])
+})
+
 test('count', async t => {
   const results1 = await fallback([0.5, 0.4, 0.3, 0.2, 0.1], pOk, {count: 2})
   t.deepEqual(results1, [0.1, 0.2])

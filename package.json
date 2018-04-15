@@ -39,6 +39,9 @@
   "eslintConfig": {
     "extends": "byungi"
   },
+  "eslintIgnore": [
+    "dist"
+  ],
   "ava": {
     "require": [
       "esm"

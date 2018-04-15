@@ -23,6 +23,7 @@ const fallback = require("fast-fallback");
 ```
 
 ## Usage
+### Basic
 ```js
 const fallback = require("fast-fallback");
 const PCancelable = require('promise-cancelable');
@@ -46,6 +47,13 @@ const asyncTransformer = server => new PCancelable((resolve, reject, onCancel)=>
 
   ws.send(...)
 })()
+```
+
+### Currying
+```js
+const curried = fallback(asyncTransformer, opts) 
+const results1 = await curried(servers)
+const results2 = await curried(otherSevers)
 ```
 
 ## API
