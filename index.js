@@ -1,3 +1,5 @@
+import Defer from 'p-state-defer'
+
 class PList {
   constructor () {
     this._list = []
@@ -21,28 +23,6 @@ class PList {
   }
 }
 
-class Defer {
-  constructor () {
-    this.completed = false
-    this.promise = new Promise((resolve, reject) => {
-      this._resolve = resolve
-      this._reject = reject
-    })
-  }
-
-  resolve (v) {
-    if (this.completed) return
-    this.completed = true
-    this._resolve(v)
-  }
-
-  reject (err) {
-    if (this.completed) return
-    this.completed = true
-    this._reject(err)
-  }
-}
-
 const fallback = (values, asyncTransformer, opts) => {
   if (typeof values === 'function') {
     opts = asyncTransformer
@@ -60,10 +40,7 @@ const fallback = (values, asyncTransformer, opts) => {
     silent: false,
     ...opts
   }
-
-  if (values.length < opts.count) {
-    throw new TypeError('[fast-fallback] `opts.count` value can not be larger than `values.length`!')
-  }
+  opts.count = Math.min(values.length, opts.count)
 
   const defer = new Defer()
   const pList = new PList()
@@ -76,7 +53,7 @@ const fallback = (values, asyncTransformer, opts) => {
     pList.add(p)
 
     p.then(result => {
-      if (defer.completed) return
+      if (defer.isCompleted) return
 
       pList.remove(p)
       if (results.length < opts.count) results.push(result)
@@ -89,7 +66,7 @@ const fallback = (values, asyncTransformer, opts) => {
       if (queue.length !== 0) next()
       if (pList.length === 0) defer.resolve(results)
     }).catch(_ => {
-      if (defer.completed) return
+      if (defer.isCompleted) return
 
       pList.remove(p)
 

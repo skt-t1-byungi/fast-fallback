@@ -3744,6 +3744,10 @@ p-locate@^2.0.0:
   dependencies:
     p-limit "^1.1.0"
 
+p-state-defer@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/p-state-defer/-/p-state-defer-0.0.5.tgz#8cb9452feff8e38acd730c65d88c5354071f5c87"
+
 p-try@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"

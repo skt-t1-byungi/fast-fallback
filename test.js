@@ -23,7 +23,7 @@ test('basic', async t => {
   t.is(calls, 5)
 })
 
-test('curring', async t => {
+test('currying', async t => {
   const fback = fallback(pOk)
   const results = await fback([0.5, 0.4, 0.3, 0.2, 0.1])
   t.deepEqual(results, [0.1])
@@ -36,7 +36,8 @@ test('count', async t => {
   const results2 = await fallback([0.5, 0.4, 0.3, 0.2, 0.1], pOk, {count: 3})
   t.deepEqual(results2, [0.1, 0.2, 0.3])
 
-  t.throws(_ => fallback([0.1], pOk, {count: 2}))
+  const results3 = await fallback([0.1], pOk, {count: 2})
+  t.deepEqual(results3, [0.1])
 })
 
 test('silent', async t => {
