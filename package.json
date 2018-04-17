@@ -1,7 +1,7 @@
 {
   "name": "fast-fallback",
   "description": "Fast fallback Lib that supports P-cancelable.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "skt-t1-byungi",
     "email": "tiniwz@gmail.com"
